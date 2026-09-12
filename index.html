@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>PrintX - Photo & Print</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f4f7fb;
+  color:#172033
+}
+header{
+  background:white;
+  padding:15px;
+  border-bottom:1px solid #ddd;
+}
+.logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:23px;
+  font-weight:bold;
+}
+.logoBox{
+  background:#1769e0;
+  color:white;
+  width:42px;
+  height:42px;
+  border-radius:12px;
+  display:grid;
+  place-items:center;
+}
+small{color:#718096}
+main{
+  max-width:900px;
+  margin:auto;
+  padding:20px;
+}
+.screen{display:none}
+.screen.active{display:block}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:15px;
+}
+.card{
+  background:white;
+  border:0;
+  border-radius:18px;
+  padding:22px;
+  text-align:left;
+  box-shadow:0 3px 15px #0001;
+  cursor:pointer;
+}
+.card .icon{font-size:30px}
+.card b,.card small{display:block;margin-top:8px}
+
+.panel{
+  background:white;
+  padding:20px;
+  border-radius:18px;
+  box-shadow:0 3px 15px #0001;
+}
+.row{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.row>*{flex:1}
+
+label{
+  display:block;
+  margin:12px 0;
+  font-size:14px;
+}
+input,select{
+  width:100%;
+  padding:12px;
+  margin-top:6px;
+  border:1px solid #d5dce7;
+  border-radius:10px;
+  background:white;
+}
+button{
+  cursor:pointer;
+}
+.primary{
+  width:100%;
+  border:0;
+  padding:13px;
+  border-radius:11px;
+  background:#1769e0;
+  color:white;
+  font-weight:bold;
+  margin-top:12px;
+}
+.back{
+  border:0;
+  background:none;
+  color:#1769e0;
+  font-weight:bold;
+  margin-bottom:10px;
+}
+.preview{
+  max-width:100%;
+  max-height:300px;
+  display:block;
+  margin:15px auto;
+  border-radius:10px;
+}
+.result{
+  margin-top:15px;
+  padding:15px;
+  border-radius:12px;
+  background:#eef5ff;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logoBox">PX</div>
+    <div>
+      PrintX
+      <small style="display:block;font-size:11px">
+        Your Photo. Your Print. Your Way.
+      </small>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- HOME -->
+<section id="home" class="screen active">
+
+<h1>PrintX</h1>
+<p>Photo & Printing Tools</p>
+
+<div class="grid">
+
+<button class="card" onclick="show('passport')">
+<div class="icon">📸</div>
+<b>Passport Photo</b>
+<small>35×45 mm • 2×2 inch</small>
+</button>
+
+<button class="card" onclick="show('printout')">
+<div class="icon">🖨️</div>
+<b>A4 Printout</b>
+<small>Colour / Black & White</small>
+</button>
+
+<button class="card" onclick="show('aadhaar')">
+<div class="icon">🪪</div>
+<b>Aadhaar Xerox</b>
+<small>Front • Back • Both</small>
+</button>
+
+<button class="card" onclick="show('pdf')">
+<div class="icon">📄</div>
+<b>PDF Maker</b>
+<small>Images → PDF</small>
+</button>
+
+<button class="card" onclick="show('cost')">
+<div class="icon">💰</div>
+<b>Cost Calculator</b>
+<small>Cost • Sale • Profit</small>
+</button>
+
+</div>
+</section>
+
+
+<!-- PASSPORT -->
+<section id="passport" class="screen">
+
+<button class="back" onclick="show('home')">← Home</button>
+
+<h2>📸 Passport Photo</h2>
+
+<div class="panel">
+
+<label>
+Select Photo
+<input type="file" id="passportFile" accept="image/*">
+</label>
+
+<img id="passportPreview" class="preview" hidden>
+
+<div class="row">
+
+<label>
+Photo Size
+<select id="photoSize">
+<option value="35x45">35 × 45 mm</option>
+<option value="50.8x50.8">2 × 2 inch</option>
+<option value="custom">Custom</option>
+</select>
+</label>
+
+<label>
+Copies
+<select id="copies">
+<option>4</option>
+<option>8</option>
+<option>16</option>
+<option>24</option>
+</select>
+</label>
+
+</div>
+
+<div id="customSize" hidden class="row">
+
+<label>
+Width (mm)
+<input type="number" id="customW" value="35">
+</label>
+
+<label>
+Height (mm)
+<input type="number" id="customH" value="45">
+</label>
+
+</div>
+
+<div class="row">
+
+<label>
+Rotate
+<input type="range" id="rotate" min="0" max="360" value="0">
+</label>
+
+<label>
+Brightness
+<input type="range" id="brightness" min="-100" max="100" value="0">
+</label>
+
+<label>
+Contrast
+<input type="range" id="contrast" min="-100" max="100" value="0">
+</label>
+
+</div>
+
+<label>
+Background
+<select id="background">
+<option>Original</option>
+<option>White</option>
+</select>
+</label>
+
+<button class="primary" onclick="generatePassport()">
+Generate A4 Passport Sheet
+</button>
+
+</div>
+</section>
+
+
+<!-- A4 PRINTOUT -->
+<section id="printout" class="screen">
+
+<button class="back" onclick="show('home')">← Home</button>
+
+<h2>🖨️ A4 Printout</h2>
+
+<div class="panel">
+
+<label>
+Select File
+<input type="file" id="printFile"
+accept="image/jpeg,image/png,application/pdf">
+</label>
+
+<div class="row">
+
+<label>
+Orientation
+<select id="orientation">
+<option>Portrait</option>
+<option>Landscape</option>
+</select>
+</label>
+
+<label>
+Sizing
+<select id="fit">
+<option>Fit to Page</option>
+<option>Fill Page</option>
+<option>Original Size</option>
+</select>
+</label>
+
+</div>
+
+<div class="row">
+
+<label>
+Colour Mode
+<select id="colorMode">
+<option>Colour</option>
+<option>Black & White</option>
+</select>
+</label>
+
+<label>
+Copies
+<input type="number" id="printCopies" value="1" min="1">
+</label>
+
+</div>
+
+<button class="primary" onclick="printA4()">
+Create A4 Print Preview
+</button>
+
+</div>
+</section>
+
+
+<!-- AADHAAR -->
+<section id="aadhaar" class="screen">
+
+<button class="back" onclick="show('home')">← Home</button>
+
+<h2>🪪 Aadhaar Xerox</h2>
+
+<div class="panel">
+
+<label>
+Aadhaar Front
+<input type="file" id="aadhaarFront" accept="image/*">
+</label>
+
+<label>
+Aadhaar Back
+<input type="file" id="aadhaarBack" accept="image/*">
+</label>
+
+<div class="row">
+
+<label>
+Print
+<select id="aadhaarSide">
+<option value="both">Front + Back</option>
+<option value="front">Front Only</option>
+<option value="back">Back Only</option>
+</select>
+</label>
+
+<label>
+Mode
+<select id="aadhaarMode">
+<option>Colour</option>
+<option>Black & White</option>
+</select>
+</label>
+
+</div>
+
+<button class="primary" onclick="aadhaarPrint()">
+Generate Aadhaar Xerox
+</button>
+
+</div>
+</section>
+
+
+<!-- PDF -->
+<section id="pdf" class="screen">
+
+<button class="back" onclick="show('home')">← Home</button>
+
+<h2>📄 PDF Maker</h2>
+
+<div class="panel">
+
+<label>
+Select Multiple Images
+<input type="file" id="pdfFiles" accept="image/*" multiple>
+</label>
+
+<div id="selectedFiles"></div>
+
+<button class="primary" onclick="makePDF()">
+Generate PDF
+</button>
+
+</div>
+</section>
+
+
+<!-- COST -->
+<section id="cost" class="screen">
+
+<button class="back" onclick="show('home')">← Home</button>
+
+<h2>💰 Cost Calculator</h2>
+
+<div class="panel">
+
+<label>
+Paper Cost / Page
+<input type="number" id="paperCost" value="0.40">
+</label>
+
+<label>
+Ink Cost / Page
+<input type="number" id="inkCost" value="1.50">
+</label>
+
+<label>
+Pages
+<input type="number" id="pages" value="1">
+</label>
+
+<label>
+Copies
+<input type="number" id="costCopies" value="1">
+</label>
+
+<label>
+Selling Price / Copy
+<input type="number" id="sellingPrice" value="5">
+</label>
+
+<button class="primary" onclick="calculate()">
+Calculate
+</button>
+
+<div id="costResult" class="result"></div>
+
+</div>
+</section>
+
+</main>
+
+
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+
+function show(id){
+
+document.querySelectorAll(".screen")
+.forEach(x=>x.classList.remove("active"));
+
+document.getElementById(id)
+.classList.add("active");
+
+}
+
+
+/* PASSPORT IMAGE */
+
+let passportData="";
+
+document.getElementById("passportFile")
+.addEventListener("change",function(){
+
+let file=this.files[0];
+
+if(!file)return;
+
+let reader=new FileReader();
+
+reader.onload=function(e){
+
+passportData=e.target.result;
+
+let img=document.getElementById("passportPreview");
+
+img.src=passportData;
+img.hidden=false;
+
+};
+
+reader.readAsDataURL(file);
+
+});
+
+
+document.getElementById("photoSize")
+.addEventListener("change",function(){
+
+document.getElementById("customSize").hidden=
+this.value!=="custom";
+
+});
+
+
+/* PASSPORT PDF */
+
+async function generatePassport(){
+
+if(!passportData){
+
+alert("Please select a photo.");
+
+return;
+
+}
+
+const {jsPDF}=window.jspdf;
+
+let size=document.getElementById("photoSize").value;
+
+let w=35;
+let h=45;
+
+if(size==="50.8x50.8"){
+
+w=50.8;
+h=50.8;
+
+}
+
+if(size==="custom"){
+
+w=parseFloat(document.getElementById("customW").value);
+h=parseFloat(document.getElementById("customH").value);
+
+}
+
+let copies=parseInt(
+document.getElementById("copies").value
+);
+
+let doc=new jsPDF({
+unit:"mm",
+format:"a4"
+});
+
+let x=8;
+let y=8;
+let gap=3;
+
+for(let i=0;i<copies;i++){
+
+if(x+w>202){
+
+x=8;
+y+=h+gap;
+
+}
+
+if(y+h>289){
+
+doc.addPage();
+
+x=8;
+y=8;
+
+}
+
+doc.addImage(
+passportData,
+"JPEG",
+x,
+y,
+w,
+h
+);
+
+x+=w+gap;
+
+}
+
+let blob=doc.output("blob");
+
+let url=URL.createObjectURL(blob);
+
+window.open(url,"_blank");
+
+}
+
+
+/* A4 PRINT */
+
+function printA4(){
+
+let file=document.getElementById("printFile").files[0];
+
+if(!file){
+
+alert("Select a file first.");
+
+return;
+
+}
+
+let url=URL.createObjectURL(file);
+
+window.open(url,"_blank");
+
+}
+
+
+/* AADHAAR */
+
+function aadhaarPrint(){
+
+let front=
+document.getElementById("aadhaarFront").files[0];
+
+let back=
+document.getElementById("aadhaarBack").files[0];
+
+let side=
+document.getElementById("aadhaarSide").value;
+
+if(side==="front"&&!front){
+
+alert("Select Aadhaar front.");
+
+return;
+
+}
+
+if(side==="back"&&!back){
+
+alert("Select Aadhaar back.");
+
+return;
+
+}
+
+if(side==="both"&&(!front||!back)){
+
+alert("Select both front and back.");
+
+return;
+
+}
+
+let file=side==="back"?back:front;
+
+let url=URL.createObjectURL(file);
+
+window.open(url,"_blank");
+
+}
+
+
+/* PDF MAKER */
+
+let pdfImages=[];
+
+document.getElementById("pdfFiles")
+.addEventListener("change",function(){
+
+pdfImages=[];
+
+let list=
+document.getElementById("selectedFiles");
+
+list.innerHTML="";
+
+[...this.files].forEach((file,index)=>{
+
+let reader=new FileReader();
+
+reader.onload=function(e){
+
+pdfImages.push(e.target.result);
+
+let div=document.createElement("div");
+
+div.style.padding="10px";
+
+div.innerHTML=
+"📄 "+(index+1)+" - "+file.name;
+
+list.appendChild(div);
+
+};
+
+reader.readAsDataURL(file);
+
+});
+
+});
+
+
+async function makePDF(){
+
+if(pdfImages.length===0){
+
+alert("Select images.");
+
+return;
+
+}
+
+const {jsPDF}=window.jspdf;
+
+let doc=new jsPDF({
+unit:"mm",
+format:"a4"
+});
+
+for(let i=0;i<pdfImages.length;i++){
+
+if(i>0)doc.addPage();
+
+doc.addImage(
+pdfImages[i],
+"JPEG",
+10,
+10,
+190,
+270
+);
+
+}
+
+let url=URL.createObjectURL(
+doc.output("blob")
+);
+
+window.open(url,"_blank");
+
+}
+
+
+/* COST */
+
+function calculate(){
+
+let paper=
+parseFloat(document.getElementById("paperCost").value)||0;
+
+let ink=
+parseFloat(document.getElementById("inkCost").value)||0;
+
+let pages=
+parseInt(document.getElementById("pages").value)||0;
+
+let copies=
+parseInt(document.getElementById("costCopies").value)||0;
+
+let sale=
+parseFloat(document.getElementById("sellingPrice").value)||0;
+
+let cost=(paper+ink)*pages*copies;
+
+let totalSale=sale*copies;
+
+let profit=totalSale-cost;
+
+document.getElementById("costResult")
+.innerHTML=
+"Printing Cost: ₹"+cost.toFixed(2)+
+"<br>Total Sale: ₹"+totalSale.toFixed(2)+
+"<br><b>Estimated Profit: ₹"+
+profit.toFixed(2)+"</b>";
+
+}
+
+</script>
+
+</body>
+</html>
